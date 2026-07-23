@@ -1,0 +1,145 @@
+{
+  "name": "@studiolxd/xapi",
+  "version": "1.0.0",
+  "description": "Framework-agnostic xAPI (Experience API / Tin Can) client for browsers, Node and any LRS, with thin adapters for React, Vue, Angular and Svelte.",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/xapi.global.js",
+  "jsdelivr": "./dist/xapi.global.js",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "llms.txt"
+  ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react.d.ts",
+        "default": "./dist/react.js"
+      },
+      "require": {
+        "types": "./dist/react.d.cts",
+        "default": "./dist/react.cjs"
+      }
+    },
+    "./vue": {
+      "import": {
+        "types": "./dist/vue.d.ts",
+        "default": "./dist/vue.js"
+      },
+      "require": {
+        "types": "./dist/vue.d.cts",
+        "default": "./dist/vue.cjs"
+      }
+    },
+    "./angular": {
+      "import": {
+        "types": "./dist/angular.d.ts",
+        "default": "./dist/angular.js"
+      },
+      "require": {
+        "types": "./dist/angular.d.cts",
+        "default": "./dist/angular.cjs"
+      }
+    },
+    "./svelte": {
+      "import": {
+        "types": "./dist/svelte.d.ts",
+        "default": "./dist/svelte.js"
+      },
+      "require": {
+        "types": "./dist/svelte.d.cts",
+        "default": "./dist/svelte.cjs"
+      }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server.d.cts",
+        "default": "./dist/server.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "vue": ">=3.3",
+    "@angular/core": ">=17",
+    "svelte": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "react-dom": { "optional": true },
+    "vue": { "optional": true },
+    "@angular/core": { "optional": true },
+    "svelte": { "optional": true }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run test:run && npm run build"
+  },
+  "devDependencies": {
+    "@angular/core": "^17.3.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/coverage-v8": "^4.1.1",
+    "jsdom": "^25.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "svelte": "^4.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^4.1.1",
+    "vue": "^3.4.0"
+  },
+  "keywords": [
+    "xapi",
+    "tin-can",
+    "experience-api",
+    "lrs",
+    "statements",
+    "react",
+    "vue",
+    "angular",
+    "svelte",
+    "vanilla",
+    "e-learning",
+    "headless"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/studiolxd/xapi.git",
+    "directory": "packages/xapi"
+  },
+  "homepage": "https://github.com/studiolxd/xapi#readme",
+  "bugs": {
+    "url": "https://github.com/studiolxd/xapi/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

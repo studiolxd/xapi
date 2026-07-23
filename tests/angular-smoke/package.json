@@ -1,0 +1,24 @@
+{
+  "name": "xapi-angular-smoke",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Minimal Angular app that compiles @studiolxd/xapi/angular in AOT to validate the decorator-free adapter (see PLAN.md §8/§13).",
+  "scripts": {
+    "build": "ng build"
+  },
+  "dependencies": {
+    "@angular/common": "^17.3.0",
+    "@angular/compiler": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/platform-browser": "^17.3.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.6.0",
+    "zone.js": "~0.14.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.0",
+    "@angular/cli": "^17.3.0",
+    "@angular/compiler-cli": "^17.3.0",
+    "typescript": "~5.4.0"
+  }
+}

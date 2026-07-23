@@ -1,0 +1,17 @@
+{
+  "name": "@studiolxd/xapi-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "example"
+  ],
+  "devDependencies": {
+    "jsdom": "^25.0.0"
+  },
+  "scripts": {
+    "build": "npm run build --workspace=packages/xapi",
+    "test": "npm run test:run --workspace=packages/xapi",
+    "dev:lib": "npm run dev --workspace=packages/xapi",
+    "dev:example": "npm run dev --workspace=example"
+  }
+}

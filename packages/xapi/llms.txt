@@ -1,0 +1,143 @@
+# @studiolxd/xapi
+
+> Headless xAPI (Experience API / Tin Can) client for the browser and Node. Framework-agnostic
+> core that talks to any standards-compliant LRS over xAPI 1.0.3 or 2.0, with a built-in
+> in-memory mock LRS (run without a real LRS) and adapters for React, Vue, Angular, and
+> Svelte. Every network operation returns a typed Result.
+
+Install: `npm i @studiolxd/xapi`
+Agent skill (Claude Code / Cursor): https://github.com/studiolxd/xapi-skills
+
+## Entry points (subpath imports)
+
+- `@studiolxd/xapi` — framework-agnostic core + vanilla (`createXapiClient`, `buildStatement`,
+  `VERBS`, `ACTIVITY_TYPES`, `validateStatement`, `Result`, `XapiError`, `createMemoryLrs`,
+  `parseXapiLaunch`, `createXapiClientFromLaunch`).
+- `@studiolxd/xapi/react` — `XapiProvider`, `useXapiClient`, `useXapiStatus` (re-exports the core too).
+- `@studiolxd/xapi/vue` — `useXapiClient()` composable.
+- `@studiolxd/xapi/angular` — `provideXapi()` + `XAPI` token (Angular >= 17).
+- `@studiolxd/xapi/svelte` — `createXapiStore()`.
+- `@studiolxd/xapi/server` — protocol helpers for implementing an LRS (Web APIs only, no Node imports).
+- CDN `<script>` global: `window.Xapi` (file `dist/xapi.global.js`).
+
+## Core concept: the client
+
+```ts
+import { createXapiClient } from '@studiolxd/xapi';
+
+const client = createXapiClient({
+  endpoint: 'https://lrs.example.com/xapi',      // required
+  auth: { username: 'key', password: 'secret' }, // or { token } or { header }
+  version: '1.0.3',                              // '1.0.3' | '2.0', default '1.0.3'
+  defaults: { actor: { mbox: 'mailto:learner@example.com' } },
+});
+
+client.status;             // XapiStatus snapshot: { endpoint, version, pending, lastError }
+client.on('change', (s) => { /* fires on every request start/settle/error */ });
+```
+
+Every network method is `async` and returns `Promise<Result<T, XapiError>>` — this is the
+one place this library diverges from `@studiolxd/scorm`'s synchronous API, because HTTP is
+inherently async.
+
+## Results: always check `.ok`
+
+```ts
+const r = await client.sendStatement(statement);
+if (r.ok) console.log(r.value);
+else console.error(r.error.kind, r.error.status, r.error.message);
+```
+
+NEVER read `.value` without checking `.ok` first. `XapiError` fields: `kind`
+(`'network'|'http'|'validation'|'timeout'|'version'|'usage'`), `operation`, `endpoint`,
+`status`, `responseBody`, `issues` (validation only), `exception`.
+
+## Client methods (all on the object returned by createXapiClient)
+
+- Statements: `sendStatement(st)`, `sendStatements(sts)`, `getStatement(id)`,
+  `getVoidedStatement(id)`, `getStatements(query?)`, `getMoreStatements(more)`,
+  `voidStatement(targetId, actor?)`
+- State: `getState(activityId, stateId, opts?)`, `setState(activityId, stateId, value, opts?)`,
+  `deleteState(activityId, stateId, opts?)`, `getStateIds(activityId, opts?)`
+- Activity Profile: `getActivityProfile`, `setActivityProfile`, `deleteActivityProfile`,
+  `getActivityProfileIds` (same shape, keyed by `activityId`+`profileId`)
+- Agent Profile: `getAgentProfile`, `setAgentProfile`, `deleteAgentProfile`,
+  `getAgentProfileIds` (same shape, keyed by `agent`+`profileId`)
+- Other: `getActivity(activityId)`, `getPerson(agent)`, `about()`
+- Building: `client.buildStatement(input)` — `verb`/`object` accept a plain IRI string,
+  `id`/`timestamp` auto-generated, `options.defaults` merged in
+- Observability: `client.status`, `client.on('change', cb)` → unsubscribe fn, `client.off(...)`,
+  `client.destroy()`
+
+`getState`/`getActivityProfile`/`getAgentProfile` resolve `ok(null)` on 404 — missing is not
+an error.
+
+## Adapter quickstarts
+
+React:
+```tsx
+import { XapiProvider, useXapiClient, useXapiStatus } from '@studiolxd/xapi/react';
+<XapiProvider options={{ endpoint: '...' }}><Course/></XapiProvider>
+function Course(){ const client = useXapiClient(); const status = useXapiStatus(); /* ... */ }
+```
+
+Vue:
+```ts
+import { useXapiClient } from '@studiolxd/xapi/vue';
+const { client, status } = useXapiClient({ endpoint: '...' }); // status is a ShallowRef
+```
+
+Angular (>=17):
+```ts
+import { provideXapi, XAPI } from '@studiolxd/xapi/angular';
+bootstrapApplication(App, { providers: [provideXapi({ endpoint: '...' })] });
+const { client, status } = inject(XAPI); // status() is a signal
+```
+
+Svelte (>=4):
+```svelte
+<script>
+  import { createXapiStore } from '@studiolxd/xapi/svelte';
+  const xapi = createXapiStore({ endpoint: '...' });
+</script>
+{#if $xapi.status.pending}sending…{/if}
+```
+
+## Mock LRS (no real LRS needed)
+
+```ts
+import { createXapiClient, createMemoryLrs } from '@studiolxd/xapi';
+const lrs = createMemoryLrs();
+const client = createXapiClient({ endpoint: 'https://mock.lrs/xapi', fetch: lrs.fetch });
+```
+
+## Server helpers (./server) — implementing an LRS
+
+`validateStatement`, `statementsEquivalent`, `applyFormat`, `buildMultipartBody`/
+`parseMultipartBody`, `etagFor`/`checkConditionalHeaders`, `negotiateVersion`,
+`isVoidingStatement`/`voidingTarget`, `verifySignedStatement`. Web APIs only
+(`Request`/`Response`/`Headers`/`crypto.subtle`) — no Node-specific imports, runs in
+Next.js Route Handlers, edge workers, and Node >=18 alike.
+
+## Gotchas (read these)
+
+- Always check `.ok` before `.value`.
+- IRIs (`verb.id`, `object.id` on an `Activity`) must be well-formed (scheme + no spaces) —
+  `validateStatement` rejects malformed ones with `kind: 'validation'`.
+- `mbox` must be `mailto:...`. Don't confuse it with `mbox_sha1sum` (a SHA-1 hex digest, no
+  `mailto:` prefix) — an actor needs exactly one identifying field (`mbox`, `mbox_sha1sum`,
+  `openid`, or `account`).
+- `timestamp`, when present, must be ISO 8601 (`buildStatement` generates a correct one via
+  `Date.prototype.toISOString()` if you omit it).
+- Resending a statement with the same `id` but different content is a conflict — the LRS
+  should (and `./server`'s `statementsEquivalent` helps implement) respond 409. Resending
+  identical content is idempotent (no error, no duplicate).
+- Voiding does not delete a statement — it's a new statement (`VERBS.voided`, `object` is a
+  `StatementRef` to the target) that hides the target from normal reads; retrieve it with
+  `getVoidedStatement`.
+- `./server` requires Web APIs (`Request`/`Response`/`crypto.subtle`) — it will not work
+  with Node-only code expecting `node:http` request/response objects.
+- SSR-safe: `parseXapiLaunch`/`createXapiClientFromLaunch` guard `window` access and return
+  `err(kind: 'usage')` instead of throwing when it's unavailable.
+- `concurrency: 'auto'` (the default) only retries a `412` **once** — if two writers race
+  repeatedly, the caller still needs its own retry/backoff loop.

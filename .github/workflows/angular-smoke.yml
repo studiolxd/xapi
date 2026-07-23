@@ -1,0 +1,55 @@
+name: angular-smoke
+
+# Validates that @studiolxd/xapi/angular compiles in a real Angular AOT/production
+# build — the acceptance criterion for the decorator-free, plain-ESM adapter
+# (PLAN.md §8). Targets the documented floor, Angular 17.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/xapi/**'
+      - 'tests/angular-smoke/**'
+      - '.github/workflows/angular-smoke.yml'
+  pull_request:
+    paths:
+      - 'packages/xapi/**'
+      - 'tests/angular-smoke/**'
+      - '.github/workflows/angular-smoke.yml'
+
+jobs:
+  aot-build:
+    name: Angular 17 AOT build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install monorepo deps
+        # Remove the lockfile before installing to sidestep npm's cross-platform
+        # optional-dependency bug (npm/cli#4828): a lockfile generated on macOS makes
+        # npm skip the Linux rollup native binary tsup/rollup need on the runner.
+        # A fresh install resolves the correct platform binaries.
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
+
+      - name: Build @studiolxd/xapi
+        run: npm run build --workspace=packages/xapi
+
+      - name: Pack the built library into the fixture
+        run: npm pack --workspace=packages/xapi --pack-destination tests/angular-smoke
+
+      - name: Install the Angular fixture (Angular 17 + the packed tarball)
+        working-directory: tests/angular-smoke
+        run: |
+          npm install
+          npm install ./studiolxd-xapi-*.tgz
+
+      - name: Angular production (AOT) build
+        working-directory: tests/angular-smoke
+        run: npx ng build --configuration production

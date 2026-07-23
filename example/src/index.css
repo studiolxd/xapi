@@ -1,0 +1,35 @@
+/* Fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@300;400;500;600&family=Google+Sans+Flex:wght@100..900&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+code {
+  font-family: 'Google Sans Code', 'Fira Code', monospace;
+}
