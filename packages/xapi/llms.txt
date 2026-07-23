@@ -6,7 +6,7 @@
 > Svelte. Every network operation returns a typed Result.
 
 Install: `npm i @studiolxd/xapi`
-Agent skill (Claude Code / Cursor): https://github.com/studiolxd/xapi-skills
+Agent skill (Claude Code / Cursor): https://github.com/studiolxd/skills
 
 ## Entry points (subpath imports)
 

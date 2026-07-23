@@ -24,7 +24,7 @@ Ecosistema (mismo patrón que scorm):
 |---|---|---|
 | `studiolxd/scorm` | Plantilla arquitectónica a calcar | `/Users/suvi/Dev/scorm` |
 | `studiolxd/lrs` | Primer consumidor: su validador de `/api/xapi/**` y helpers de backend deben consumir esta librería en vez de reimplementar | `/Users/suvi/Dev/lrs/PLAN.md` (puntos 2 y 3) |
-| `studiolxd/xapi-skills` | Skills de agente IA que enseñan a usar esta librería (repo aparte, como `scorm-skills`) | `/Users/suvi/Dev/skills/xapi-skills/PLAN.md` |
+| `studiolxd/skills` | Marketplace de skills de agente IA (incluye `xapi-skills`, que enseña a usar esta librería) | `/Users/suvi/Dev/skills/xapi-skills/PLAN.md` |
 
 `@studiolxd/lrs-widget` es un concepto **distinto**: habla con la API de
 lectura propia de LRS (`/api/widget/v1/**` + `ReadToken`), no con el
@@ -500,7 +500,7 @@ volumen en scorm: ~420 tests. Todos los tests usan el mock LRS — cero red.
   snippet cada uno) → opciones del cliente (tabla) → High-Level API por
   dominio (cada método con snippet) → Error Handling (`Result`) → Launch →
   Mock LRS / Testing → Server helpers → TypeScript → AI coding agents
-  (marketplace `studiolxd/xapi-skills`) → Additional Documentation → License.
+  (marketplace `studiolxd/skills`) → Additional Documentation → License.
 - **README raíz** (6 idiomas): tabla de packages, getting started, estructura,
   publishing (manual), license — como el de scorm.
 - **`packages/xapi/docs/`**: `version-differences.md` (tabla 1.0.3 vs 2.0,

@@ -309,14 +309,15 @@ const actor: Actor = { mbox: 'mailto:learner@example.com' };
 
 ## Agenci AI do programowania
 
-Używasz Claude Code, Cursora lub innego asystenta AI do programowania? Dodaj **[xapi-skills](https://github.com/studiolxd/xapi-skills)**, aby agent wiedział, jak korzystać z tej biblioteki:
+Używasz Claude Code, Cursora lub innego asystenta AI do programowania? Dodaj **[xapi-skills](https://github.com/studiolxd/skills)**, aby agent wiedział, jak korzystać z tej biblioteki:
 
 ```
 # Claude Code
-/plugin marketplace add studiolxd/xapi-skills
-/plugin install xapi-skills@studiolxd-xapi
+/plugin marketplace add studiolxd/skills
+/plugin install xapi-skills@studiolxd
 
-# Cursor: skopiuj cursor/xapi.mdc do .cursor/rules/ swojego projektu
+# Cursor: skopiuj xapi-skills/cursor/xapi.mdc do .cursor/rules/ swojego projektu
+# Codex/ChatGPT: dołącz xapi-skills/agents/xapi.md do pliku AGENTS.md swojego projektu
 ```
 
 ## Dodatkowa dokumentacja
