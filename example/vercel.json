@@ -1,5 +1,5 @@
 {
-  "installCommand": "cd .. && npm install --no-package-lock --legacy-peer-deps && npm run build",
-  "buildCommand": "npm run build",
+  "installCommand": "cd .. && pnpm install --frozen-lockfile && pnpm --filter @studiolxd/xapi run build",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist"
 }

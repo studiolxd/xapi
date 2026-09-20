@@ -24,25 +24,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Must come BEFORE setup-node: `cache: pnpm` shells out to `pnpm store path`.
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: pnpm
 
       - name: Install monorepo deps
-        # Remove the lockfile before installing to sidestep npm's cross-platform
-        # optional-dependency bug (npm/cli#4828): a lockfile generated on macOS makes
-        # npm skip the Linux rollup native binary tsup/rollup need on the runner.
-        # A fresh install resolves the correct platform binaries.
-        run: |
-          rm -f package-lock.json
-          npm install --no-audit --no-fund
+        # No workaround needed any more: the npm/cli#4828 hack that lived here
+        # (rm -f package-lock.json) existed because a macOS-generated lockfile
+        # made npm skip the Linux rollup binary. pnpm records every platform
+        # variant and filters at install time.
+        run: pnpm install --frozen-lockfile
 
       - name: Build @studiolxd/xapi
-        run: npm run build --workspace=packages/xapi
+        run: pnpm --filter @studiolxd/xapi run build
 
       - name: Pack the built library into the fixture
-        run: npm pack --workspace=packages/xapi --pack-destination tests/angular-smoke
+        # Deliberately `npm pack`, not `pnpm pack`: the smoke test must validate
+        # the very artefact `npm publish` will produce.
+        working-directory: packages/xapi
+        run: npm pack --pack-destination ../../tests/angular-smoke
 
       - name: Install the Angular fixture (Angular 17 + the packed tarball)
         working-directory: tests/angular-smoke

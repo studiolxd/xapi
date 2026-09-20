@@ -1,0 +1,13 @@
+# Replaces the "workspaces" field in package.json, which pnpm does not read.
+#
+# tests/** is deliberately excluded: tests/angular-smoke stands in for a real
+# downstream consumer and is installed with npm, against the flat node_modules
+# that @angular-devkit/build-angular expects.
+packages:
+  - 'packages/*'
+  - 'example'
+
+# pnpm does not run dependency install scripts unless they are approved here.
+# esbuild (via tsup and vite) needs its own or the build produces nothing.
+allowBuilds:
+  esbuild: true
