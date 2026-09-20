@@ -7,7 +7,7 @@ monorepo. For how to *use* the published library, see `packages/xapi/llms.txt`.
 
 `@studiolxd/xapi` — a framework-agnostic xAPI (Experience API / Tin Can) client,
 supporting xAPI 1.0.3 and xAPI 2.0 (IEEE 9274.1.1), against any standard LRS.
-npm workspaces monorepo:
+pnpm workspaces monorepo:
 
 - `packages/xapi/` — the published library (`@studiolxd/xapi`).
   - `src/` core is **framework-agnostic** (no framework imports outside `src/react`,
@@ -21,12 +21,17 @@ npm workspaces monorepo:
 
 ## Commands (run from repo root)
 
-- `npm run build` — build the library.
-- `npm run test` — run the library test suite (vitest).
-- `npm run dev:example` — run the demo at http://localhost:5173.
-- Per-package: `npm run typecheck --workspace=packages/xapi`.
+- `pnpm run build` — build the library.
+- `pnpm run test` — run the library test suite (vitest).
+- `pnpm run dev:example` — run the demo at http://localhost:5173.
+- Per-package: `pnpm --filter @studiolxd/xapi run typecheck`.
 
 Always run `typecheck` + `test:run` + `build` in `packages/xapi` before committing.
+
+Dependencies are managed with **pnpm**; publishing still goes out with `npm publish`
+from `packages/xapi`. `tests/angular-smoke/` is deliberately outside the workspace
+and installed with npm — it stands in for a real downstream consumer. Never run
+`npm install` at the repo root.
 
 ## Conventions
 

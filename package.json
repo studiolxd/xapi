@@ -1,17 +1,17 @@
 {
   "name": "@studiolxd/xapi-monorepo",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "example"
-  ],
+  "packageManager": "pnpm@11.18.0",
   "devDependencies": {
     "jsdom": "^25.0.0"
   },
   "scripts": {
-    "build": "npm run build --workspace=packages/xapi",
-    "test": "npm run test:run --workspace=packages/xapi",
-    "dev:lib": "npm run dev --workspace=packages/xapi",
-    "dev:example": "npm run dev --workspace=example"
+    "build": "pnpm --filter @studiolxd/xapi run build",
+    "test": "pnpm --filter @studiolxd/xapi run test:run",
+    "typecheck": "pnpm --filter @studiolxd/xapi run typecheck",
+    "dev:lib": "pnpm --filter @studiolxd/xapi run dev",
+    "dev:example": "pnpm --filter xapi-example run dev",
+    "lint:example": "pnpm --filter xapi-example run lint",
+    "build:example": "pnpm --filter xapi-example run build"
   }
 }

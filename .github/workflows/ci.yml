@@ -1,7 +1,7 @@
 name: CI
 
 # Consolidates the ci.yml that used to live in packages/xapi/.github. GitHub
-# Actions only reads .github/workflows from the repository ROOT, so it never
+# Actions only reads .github/workflows from the repository root, so it never
 # ran: typecheck, tests and builds were not validated by CI at all.
 
 on:
@@ -20,31 +20,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22]
+        node-version: [22, 24]
 
     steps:
       - uses: actions/checkout@v4
 
+      # Must come BEFORE setup-node: `cache: pnpm` shells out to `pnpm store path`.
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Typecheck (library)
-        run: npm run typecheck --workspace=packages/xapi
+        run: pnpm run typecheck
 
       - name: Test (library)
-        run: npm run test:run --workspace=packages/xapi
+        run: pnpm run test
 
       - name: Build (library)
-        run: npm run build --workspace=packages/xapi
+        run: pnpm run build
 
       - name: Lint (example)
-        run: npm run lint --workspace=example
+        run: pnpm run lint:example
 
       # After the library build: the example resolves @studiolxd/xapi through
       # the workspace, whose `exports` point at dist/.
       - name: Build (example)
-        run: npm run build --workspace=example
+        run: pnpm run build:example
