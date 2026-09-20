@@ -1,0 +1,50 @@
+name: CI
+
+# Consolidates the ci.yml that used to live in packages/xapi/.github. GitHub
+# Actions only reads .github/workflows from the repository ROOT, so it never
+# ran: typecheck, tests and builds were not validated by CI at all.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Typecheck, test & build (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck (library)
+        run: npm run typecheck --workspace=packages/xapi
+
+      - name: Test (library)
+        run: npm run test:run --workspace=packages/xapi
+
+      - name: Build (library)
+        run: npm run build --workspace=packages/xapi
+
+      - name: Lint (example)
+        run: npm run lint --workspace=example
+
+      # After the library build: the example resolves @studiolxd/xapi through
+      # the workspace, whose `exports` point at dist/.
+      - name: Build (example)
+        run: npm run build --workspace=example
