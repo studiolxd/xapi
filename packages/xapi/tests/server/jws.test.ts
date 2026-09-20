@@ -37,9 +37,14 @@ describe('verifySignedStatement', () => {
 
   it('rejects a tampered signature', async () => {
     const { jws, publicKey } = await signJws('RS256', {}, { hello: 'world' });
-    const lastChar = jws.slice(-1);
-    const swapped = lastChar === 'A' ? 'B' : 'A';
-    const tampered = jws.slice(0, -1) + swapped;
+    const [headerB64, payloadB64, signatureB64] = jws.split('.');
+    // Tamper with the FIRST signature character, which always carries six
+    // significant bits. The last character of a 256-byte (RS256) base64url
+    // signature carries only two significant bits plus discarded padding, so
+    // flipping it decodes to the same bytes ~25% of the time, leaving the
+    // signature intact and the assertion flaky.
+    const swapped = signatureB64[0] === 'A' ? 'B' : 'A';
+    const tampered = `${headerB64}.${payloadB64}.${swapped}${signatureB64.slice(1)}`;
     const result = await verifySignedStatement(tampered, {
       allowedAlgorithms: ['RS256'],
       resolveKey: async () => publicKey,
